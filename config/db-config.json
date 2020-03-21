@@ -1,0 +1,16 @@
+{
+  "dbOptions": {
+    "connection": {
+      "type": "mssql",
+      "host": "localhost",
+      "port": 1433,
+      "username": "sa",
+      "password": "23752100",
+      "database": "rs5",
+      "entities":"rs5-tables",
+      "synchronize": true
+    }
+  }
+}
+
+      
