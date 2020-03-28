@@ -14,12 +14,13 @@ import {
 import { Repository, Connection } from "typeorm";
 import { DatabaseService } from "../../db";
 import { Photo } from "../../db/testdb1/entities";
+import { PhotoService } from "./photo.service";
 
 @Controller("Webapi/Photo")
 export class PhotoController {
   private conn: Connection;      // database connection
   private photoRepo : Repository<Photo>;
-  constructor(private dbSvc: DatabaseService) {
+  constructor(private dbSvc: DatabaseService, private svc: PhotoService) {
     this.conn = this.dbSvc.connection;
     this.photoRepo = this.dbSvc.repository<Photo>("Photo");
   }
@@ -32,8 +33,9 @@ export class PhotoController {
     res.status(HttpStatus.OK).json(photos);
   }
   @Get("/:id")
-  public async getPhotos(@Req() req, @Res() res: Response, @Param("id") id) {
-    const photo = await this.photoRepo.findOne(id);
+  public async getPhotoById(@Req() req, @Res() res: Response, @Param("id") id) {
+   // const photo = await this.photoRepo.findOne(id);
+    let photo = await this.svc.getPhoto(id);
     res.status(HttpStatus.OK).json(photo);
   }
   // C
@@ -52,9 +54,19 @@ export class PhotoController {
 }
    */
   @Post()
-  public async addPhoto(@Res() res: Response, @Body("photo") photo) {
+  public async addPhoto(@Res() res: Response, @Body() photo) {
    // const addedPhoto = await this.photoRepo.persist(photo);
-    const addedPhoto = await this.photoRepo.save(photo);
+   // const addedPhoto = await this.photoRepo.save(photo);
+    let addedPhoto = await this.svc.insPhoto(photo);
+    res.status(HttpStatus.CREATED).json(addedPhoto);
+  }
+
+  // 修改
+  @Post('/:id')
+  public async editPhoto(@Res() res: Response, @Body() photo) {
+   // const addedPhoto = await this.photoRepo.persist(photo);
+   // const addedPhoto = await this.photoRepo.save(photo);
+    let addedPhoto = await this.svc.updPhoto(photo);
     res.status(HttpStatus.CREATED).json(addedPhoto);
   }
   // D
@@ -64,8 +76,9 @@ export class PhotoController {
     @Res() res: Response,
     @Param("id") id
   ) {
-    const photo = await this.photoRepo.findOne(id);
-    const deletedPhoto = await this.photoRepo.remove(photo);
+    //const photo = await this.photoRepo.findOne(id);
+    //const deletedPhoto = await this.photoRepo.remove(photo);
+    let deletedPhoto = await this.svc.delPhoto(id);
     res.status(HttpStatus.OK).json(deletedPhoto);
   }
 }
